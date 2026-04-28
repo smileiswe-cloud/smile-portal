@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Smile Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 28px 20px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .categories {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .cat-btn {
+            flex: 1;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .cat-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .cat-btn[data-cat="Mobile"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .cat-btn[data-cat="Cosmetic"] {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+        }
+        
+        .results-count {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+            padding-left: 8px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .product-card:active {
+            transform: scale(0.98);
+            background: #fafafa;
+        }
+        
+        .product-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .product-price {
+            color: #e67e22;
+            font-weight: 800;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .product-stock {
+            font-size: 13px;
+            color: #27ae60;
+            font-weight: 500;
+        }
+        
+        .product-stock.low {
+            color: #e74c3c;
+        }
+        
+        .product-skid {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 8px;
+            font-family: monospace;
+        }
+        
+        .loading-state, .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            padding: 16px;
+            color: #bbb;
+            font-size: 11px;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        
+        .back-to-top:active {
+            transform: scale(0.92);
+        }
+        
+        .back-to-top.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✨ Smile Portal</h1>
+        <p>Mobile & Cosmetics</p>
+    </div>
+    
+    <div class="search-container">
+        <input type="text" class="search-box" 
+               placeholder="🔍 ပစ္စည်းအမည် သို့ SKID ရိုက်ထည့်ပါ..." 
+               id="searchInput" autocomplete="off">
+    </div>
+    
+    <div class="categories">
+        <div class="cat-btn" data-cat="Mobile">📱 Mobile</div>
+        <div class="cat-btn" data-cat="Cosmetic">💄 Cosmetics</div>
+    </div>
+    
+    <div id="resultsCount" class="results-count" style="display: none;"></div>
+    <div id="results">
+        <div class="empty-state">
+            📱 ပစ္စည်းအမည် (သို့) SKID ရိုက်ထည့်ပါ။
+        </div>
+    </div>
+    
+    <div class="footer">
+        Powered by SMILE System
+    </div>
+    
+    <div class="back-to-top hidden" id="backToTop">↑</div>
+    
+    <script>
+        let timeout = null;
+        
+        const telegram = window.Telegram.WebApp;
+        telegram.ready();
+        telegram.expand();
+        
+        const user = telegram.initDataUnsafe?.user;
+        const chatId = user?.id;
+        
+        // ⚠️ IMPORTANT: Replace with your Apps Script URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxj9Z1I7sd9zFuVOjIVRfpo7aJKWbZY1hBNVqo0KYK9F0bgI2RFCr1rAdU5tDk4ATU/exec';
+        
+        const searchInput = document.getElementById('searchInput');
+        const resultsDiv = document.getElementById('results');
+        const resultsCountDiv = document.getElementById('resultsCount');
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                searchProducts(e.target.value);
+            }, 400);
+        });
+        
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const category = this.getAttribute('data-cat');
+                searchInput.value = category;
+                searchProducts(category);
+            });
+        });
+        
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('hidden');
+            } else {
+                backToTopBtn.classList.add('hidden');
+            }
+        });
+        
+        async function searchProducts(query) {
+            if (!query.trim()) {
+                showEmptyState();
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'search', 
+                        query: query,
+                        chatId: chatId 
+                    })
+                });
+                const data = await response.json();
+                displayResults(data, query);
+            } catch(err) {
+                console.error(err);
+                showError();
+            }
+        }
+        
+        function displayResults(products, query) {
+            if (!products || products.length === 0) {
+                resultsDiv.innerHTML = `<div class="empty-state">❌ "${escapeHtml(query)}" နှင့် ဆက်စပ်သော ပစ္စည်း မတွေ့ပါ။</div>`;
+                resultsCountDiv.style.display = 'none';
+                return;
+            }
+            
+            resultsCountDiv.style.display = 'block';
+            resultsCountDiv.innerHTML = `📊 တွေ့ရှိစုစုပေါင်း: ${products.length} ခု`;
+            
+            let html = '';
+            for (let p of products) {
+                const stockClass = p.stock <= 5 ? 'low' : '';
+                html += `
+                    <div class="product-card" onclick="viewProduct('${escapeHtml(p.skid)}')">
+                        <div class="product-name">📱 ${escapeHtml(p.name)}</div>
+                        <div class="product-price">💰 ${formatPrice(p.price)} Ks</div>
+                        <div class="product-stock ${stockClass}">📦 လက်ကျန်: ${p.stock} ခု</div>
+                        <div class="product-skid">🔑 SKID: ${escapeHtml(p.skid)}</div>
+                    </div>
+                `;
+            }
+            resultsDiv.innerHTML = html;
+        }
+        
+        function viewProduct(skid) {
+            telegram.sendData(JSON.stringify({ action: 'view', skid: skid }));
+        }
+        
+        function showLoading() {
+            resultsDiv.innerHTML = '<div class="loading-state">⏳ ရှာဖွေနေပါသည်...</div>';
+            resultsCountDiv.style.display = 'none';
+        }
+        
+        function showEmptyState() {
+            resultsDiv.innerHTML = '<div class="empty-state">📱 ပစ္စည်းအမည် (သို့) SKID ရိုက်ထည့်ပါ။</div>';
+            resultsCountDiv.style.display = 'none';
+        }
+        
+        function showError() {
+            resultsDiv.innerHTML = '<div class="empty-state">❌ ချိတ်ဆက်မှု အမှားရှိပါသည်။ နောက်မှ ထပ်ကြိုးစားပါ။</div>';
+            resultsCountDiv.style.display = 'none';
+        }
+        
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+    </script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</body>
+</html>

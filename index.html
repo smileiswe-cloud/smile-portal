@@ -19,7 +19,6 @@
             padding-bottom: 80px;
         }
         
-        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -40,7 +39,6 @@
             opacity: 0.9;
         }
         
-        /* Mode Toggle */
         .mode-toggle {
             display: flex;
             gap: 12px;
@@ -74,7 +72,6 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
         
-        /* Search Box */
         .search-container {
             margin-bottom: 20px;
         }
@@ -96,7 +93,6 @@
             box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
         }
         
-        /* Categories */
         .categories {
             display: flex;
             gap: 12px;
@@ -133,7 +129,6 @@
             border: none;
         }
         
-        /* Cashier Panel */
         .cashier-panel {
             background: white;
             border-radius: 24px;
@@ -231,7 +226,6 @@
             display: block;
         }
         
-        /* Results */
         .results-count {
             font-size: 13px;
             color: #888;
@@ -286,7 +280,6 @@
             font-family: monospace;
         }
         
-        /* Points Display */
         .points-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -347,7 +340,6 @@
             display: none;
         }
         
-        /* Login Overlay */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -410,7 +402,6 @@
         <p>Mobile & Cosmetics</p>
     </div>
     
-    <!-- Mode Toggle -->
     <div class="mode-toggle">
         <button class="mode-btn active" id="customerModeBtn">👤 Customer Mode</button>
         <button class="mode-btn cashier" id="cashierModeBtn">💼 Cashier Mode</button>
@@ -429,21 +420,11 @@
             <div class="cat-btn" data-cat="Cosmetic">💄 Cosmetics</div>
         </div>
         
-        <!-- Points Display for Customer -->
         <div id="pointsDisplay" style="display: none;">
             <div class="points-card">
                 <div class="points-label">💎 သင်၏ Points လက်ကျန်</div>
                 <div class="points-amount" id="customerPoints">0</div>
                 <div class="points-label" id="customerTier">🥉 Gold Member</div>
-            </div>
-        </div>
-        
-        <!-- Stamps Display -->
-        <div id="stampsDisplay" style="display: none;">
-            <div class="points-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="points-label">📮 သင်၏ Stamps စုဆောင်းမှု</div>
-                <div class="points-amount" id="customerStamps">0</div>
-                <div class="points-label" id="stampsProgress">0/30 stamps to VVIP</div>
             </div>
         </div>
         
@@ -495,7 +476,6 @@
     
     <div class="back-to-top hidden" id="backToTop">↑</div>
     
-    <!-- Login Overlay -->
     <div id="loginOverlay" class="login-overlay" style="display: none;">
         <div class="login-box">
             <h3>💼 Cashier Login</h3>
@@ -514,7 +494,6 @@
         let currentMode = "customer";
         let isCashierLoggedIn = false;
         
-        // Cashier credentials
         const CASHIER_PASSWORD = "smile2024";
         
         const telegram = window.Telegram.WebApp;
@@ -524,10 +503,9 @@
         const user = telegram.initDataUnsafe?.user;
         const chatId = user?.id;
         
-        // Apps Script URL - UPDATE THIS WITH YOUR URL
+        // ⚠️ IMPORTANT: Replace with your Apps Script URL
         const API_URL = 'https://script.google.com/macros/s/AKfycbxvMXwcjyhhtgh0kXIroKwPBcgPA50MLOF5Xs-GrmJBoiXJL4K8d-Tmj0yohTpTos0/exec';
         
-        // DOM Elements
         const searchInput = document.getElementById('searchInput');
         const resultsDiv = document.getElementById('results');
         const resultsCountDiv = document.getElementById('resultsCount');
@@ -541,15 +519,8 @@
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
         const pointsDisplay = document.getElementById('pointsDisplay');
-        const stampsDisplay = document.getElementById('stampsDisplay');
         const customerPoints = document.getElementById('customerPoints');
         const customerTier = document.getElementById('customerTier');
-        const customerStamps = document.getElementById('customerStamps');
-        const stampsProgress = document.getElementById('stampsProgress');
-        
-        // =====================================================
-        // MODE SWITCHING
-        // =====================================================
         
         customerModeBtn.addEventListener('click', () => {
             currentMode = "customer";
@@ -559,7 +530,6 @@
             cashierSection.style.display = "none";
             loginOverlay.style.display = "none";
             loadCustomerPoints();
-            loadCustomerStamps();
         });
         
         cashierModeBtn.addEventListener('click', () => {
@@ -576,10 +546,6 @@
             }
         });
         
-        // =====================================================
-        // LOGIN HANDLER
-        // =====================================================
-        
         loginBtn.addEventListener('click', () => {
             const password = loginPassword.value;
             if (password === CASHIER_PASSWORD) {
@@ -587,6 +553,7 @@
                 loginOverlay.style.display = "none";
                 loginError.textContent = "";
                 loginPassword.value = "";
+                cashierModeBtn.click();
             } else {
                 loginError.textContent = "❌ Incorrect password. Please try again.";
             }
@@ -596,10 +563,6 @@
             isCashierLoggedIn = false;
             customerModeBtn.click();
         });
-        
-        // =====================================================
-        // LOAD CUSTOMER DATA
-        // =====================================================
         
         async function loadCustomerPoints() {
             if (!chatId) return;
@@ -624,37 +587,6 @@
                 console.error("Failed to load points:", err);
             }
         }
-        
-        async function loadCustomerStamps() {
-            if (!chatId) return;
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'getStamps', 
-                        chatId: chatId 
-                    })
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    stampsDisplay.style.display = "block";
-                    customerStamps.textContent = data.stamps;
-                    stampsProgress.textContent = data.stamps + "/30 stamps to VVIP";
-                    if (data.stamps >= 30) {
-                        stampsProgress.innerHTML = "🎉 VVIP Achieved! 🎉";
-                    }
-                }
-            } catch(err) {
-                console.error("Failed to load stamps:", err);
-            }
-        }
-        
-        // =====================================================
-        // PRODUCT SEARCH
-        // =====================================================
         
         searchInput.addEventListener('input', function(e) {
             clearTimeout(timeout);
@@ -738,10 +670,6 @@
             telegram.sendData(JSON.stringify({ action: 'view', skid: skid }));
         }
         
-        // =====================================================
-        // CASHIER ADD POINTS
-        // =====================================================
-        
         const pointsForm = document.getElementById('pointsForm');
         const cashierMessage = document.getElementById('cashierMessage');
         
@@ -789,7 +717,6 @@
                     pointsForm.reset();
                     if (chatId && data.chatId === chatId) {
                         loadCustomerPoints();
-                        loadCustomerStamps();
                     }
                 } else {
                     cashierMessage.className = "message error";
@@ -800,10 +727,6 @@
                 cashierMessage.textContent = "❌ Connection error. Please try again.";
             }
         });
-        
-        // =====================================================
-        // HELPER FUNCTIONS
-        // =====================================================
         
         function showLoading() {
             resultsDiv.innerHTML = '<div class="loading-state">⏳ ရှာဖွေနေပါသည်...</div>';
@@ -834,9 +757,7 @@
             });
         }
         
-        // Load all data on start
         loadCustomerPoints();
-        loadCustomerStamps();
     </script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </body>

@@ -19,6 +19,7 @@
             padding-bottom: 80px;
         }
         
+        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -39,6 +40,41 @@
             opacity: 0.9;
         }
         
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 40px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 36px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .mode-btn.cashier.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        /* Search Box */
         .search-container {
             margin-bottom: 20px;
         }
@@ -60,6 +96,7 @@
             box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
         }
         
+        /* Categories */
         .categories {
             display: flex;
             gap: 12px;
@@ -96,6 +133,105 @@
             border: none;
         }
         
+        /* Cashier Panel */
+        .cashier-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            display: none;
+        }
+        
+        .cashier-panel.show {
+            display: block;
+        }
+        
+        .cashier-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 15px;
+            background: #fafafa;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-cashier {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+        
+        /* Results */
         .results-count {
             font-size: 13px;
             color: #888;
@@ -150,6 +286,27 @@
             font-family: monospace;
         }
         
+        /* Points Display */
+        .points-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .points-amount {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .points-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
         .loading-state, .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -189,6 +346,62 @@
         .back-to-top.hidden {
             display: none;
         }
+        
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+        }
+        
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
+            margin-top: 16px;
+            font-size: 16px;
+        }
+        
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            margin-top: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .login-error {
+            color: #e74c3c;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -197,21 +410,82 @@
         <p>Mobile & Cosmetics</p>
     </div>
     
-    <div class="search-container">
-        <input type="text" class="search-box" 
-               placeholder="🔍 ပစ္စည်းအမည် သို့ SKID ရိုက်ထည့်ပါ..." 
-               id="searchInput" autocomplete="off">
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+        <button class="mode-btn active" id="customerModeBtn">👤 Customer Mode</button>
+        <button class="mode-btn cashier" id="cashierModeBtn">💼 Cashier Mode</button>
     </div>
     
-    <div class="categories">
-        <div class="cat-btn" data-cat="Mobile">📱 Mobile</div>
-        <div class="cat-btn" data-cat="Cosmetic">💄 Cosmetics</div>
+    <!-- Customer Section -->
+    <div id="customerSection">
+        <div class="search-container">
+            <input type="text" class="search-box" 
+                   placeholder="🔍 ပစ္စည်းအမည် သို့ SKID ရိုက်ထည့်ပါ..." 
+                   id="searchInput" autocomplete="off">
+        </div>
+        
+        <div class="categories">
+            <div class="cat-btn" data-cat="Mobile">📱 Mobile</div>
+            <div class="cat-btn" data-cat="Cosmetic">💄 Cosmetics</div>
+        </div>
+        
+        <!-- Points Display for Customer -->
+        <div id="pointsDisplay" style="display: none;">
+            <div class="points-card">
+                <div class="points-label">💎 သင်၏ Points လက်ကျန်</div>
+                <div class="points-amount" id="customerPoints">0</div>
+                <div class="points-label" id="customerTier">🥉 Gold Member</div>
+            </div>
+        </div>
+        
+        <!-- Stamps Display -->
+        <div id="stampsDisplay" style="display: none;">
+            <div class="points-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="points-label">📮 သင်၏ Stamps စုဆောင်းမှု</div>
+                <div class="points-amount" id="customerStamps">0</div>
+                <div class="points-label" id="stampsProgress">0/30 stamps to VVIP</div>
+            </div>
+        </div>
+        
+        <div id="resultsCount" class="results-count" style="display: none;"></div>
+        <div id="results">
+            <div class="empty-state">
+                📱 ပစ္စည်းအမည် (သို့) SKID ရိုက်ထည့်ပါ။
+            </div>
+        </div>
     </div>
     
-    <div id="resultsCount" class="results-count" style="display: none;"></div>
-    <div id="results">
-        <div class="empty-state">
-            📱 ပစ္စည်းအမည် (သို့) SKID ရိုက်ထည့်ပါ။
+    <!-- Cashier Section (Hidden by default) -->
+    <div id="cashierSection" style="display: none;">
+        <div class="cashier-panel show">
+            <div class="cashier-title">
+                💰 Add Points for Customer
+            </div>
+            <form id="pointsForm">
+                <div class="form-group">
+                    <label>📞 Customer Phone Number</label>
+                    <input type="tel" id="phone" placeholder="09780001662" required>
+                </div>
+                <div class="form-group">
+                    <label>💰 Purchase Amount (MMK)</label>
+                    <input type="number" id="amount" placeholder="50000" required>
+                </div>
+                <div class="form-group">
+                    <label>📦 Category</label>
+                    <select id="category">
+                        <option value="Mobile">Mobile</option>
+                        <option value="Cosmetic">Cosmetic</option>
+                        <option value="Accessory">Accessory</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📝 Invoice / Order ID</label>
+                    <input type="text" id="invoice" placeholder="INV-001">
+                </div>
+                <button type="submit" class="btn-primary btn-cashier">✅ Add Points</button>
+            </form>
+            <div id="cashierMessage" class="message"></div>
+            <button id="cashierLogoutBtn" class="btn-primary logout-btn" style="margin-top: 16px;">🚪 Logout</button>
         </div>
     </div>
     
@@ -221,8 +495,27 @@
     
     <div class="back-to-top hidden" id="backToTop">↑</div>
     
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay" style="display: none;">
+        <div class="login-box">
+            <h3>💼 Cashier Login</h3>
+            <input type="password" id="loginPassword" placeholder="Enter Cashier Password">
+            <button id="loginBtn">Login</button>
+            <div id="loginError" class="login-error"></div>
+        </div>
+    </div>
+    
     <script>
+        // =====================================================
+        // SMILE PORTAL - Cashier & Customer Mode
+        // =====================================================
+        
         let timeout = null;
+        let currentMode = "customer";
+        let isCashierLoggedIn = false;
+        
+        // Cashier credentials
+        const CASHIER_PASSWORD = "smile2024";
         
         const telegram = window.Telegram.WebApp;
         telegram.ready();
@@ -231,13 +524,137 @@
         const user = telegram.initDataUnsafe?.user;
         const chatId = user?.id;
         
-        // ⚠️ IMPORTANT: Replace with your Apps Script URL
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxj9Z1I7sd9zFuVOjIVRfpo7aJKWbZY1hBNVqo0KYK9F0bgI2RFCr1rAdU5tDk4ATU/exec';
+        // Apps Script URL - UPDATE THIS WITH YOUR URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxvMXwcjyhhtgh0kXIroKwPBcgPA50MLOF5Xs-GrmJBoiXJL4K8d-Tmj0yohTpTos0/exec';
         
+        // DOM Elements
         const searchInput = document.getElementById('searchInput');
         const resultsDiv = document.getElementById('results');
         const resultsCountDiv = document.getElementById('resultsCount');
         const backToTopBtn = document.getElementById('backToTop');
+        const customerModeBtn = document.getElementById('customerModeBtn');
+        const cashierModeBtn = document.getElementById('cashierModeBtn');
+        const customerSection = document.getElementById('customerSection');
+        const cashierSection = document.getElementById('cashierSection');
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        const pointsDisplay = document.getElementById('pointsDisplay');
+        const stampsDisplay = document.getElementById('stampsDisplay');
+        const customerPoints = document.getElementById('customerPoints');
+        const customerTier = document.getElementById('customerTier');
+        const customerStamps = document.getElementById('customerStamps');
+        const stampsProgress = document.getElementById('stampsProgress');
+        
+        // =====================================================
+        // MODE SWITCHING
+        // =====================================================
+        
+        customerModeBtn.addEventListener('click', () => {
+            currentMode = "customer";
+            customerModeBtn.classList.add('active');
+            cashierModeBtn.classList.remove('active');
+            customerSection.style.display = "block";
+            cashierSection.style.display = "none";
+            loginOverlay.style.display = "none";
+            loadCustomerPoints();
+            loadCustomerStamps();
+        });
+        
+        cashierModeBtn.addEventListener('click', () => {
+            currentMode = "cashier";
+            customerModeBtn.classList.remove('active');
+            cashierModeBtn.classList.add('active');
+            customerSection.style.display = "none";
+            cashierSection.style.display = "block";
+            
+            if (isCashierLoggedIn) {
+                loginOverlay.style.display = "none";
+            } else {
+                loginOverlay.style.display = "flex";
+            }
+        });
+        
+        // =====================================================
+        // LOGIN HANDLER
+        // =====================================================
+        
+        loginBtn.addEventListener('click', () => {
+            const password = loginPassword.value;
+            if (password === CASHIER_PASSWORD) {
+                isCashierLoggedIn = true;
+                loginOverlay.style.display = "none";
+                loginError.textContent = "";
+                loginPassword.value = "";
+            } else {
+                loginError.textContent = "❌ Incorrect password. Please try again.";
+            }
+        });
+        
+        document.getElementById('cashierLogoutBtn').addEventListener('click', () => {
+            isCashierLoggedIn = false;
+            customerModeBtn.click();
+        });
+        
+        // =====================================================
+        // LOAD CUSTOMER DATA
+        // =====================================================
+        
+        async function loadCustomerPoints() {
+            if (!chatId) return;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'getPoints', 
+                        chatId: chatId 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    pointsDisplay.style.display = "block";
+                    customerPoints.textContent = formatPrice(data.points);
+                    customerTier.textContent = data.tier || "🥉 Gold Member";
+                }
+            } catch(err) {
+                console.error("Failed to load points:", err);
+            }
+        }
+        
+        async function loadCustomerStamps() {
+            if (!chatId) return;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'getStamps', 
+                        chatId: chatId 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    stampsDisplay.style.display = "block";
+                    customerStamps.textContent = data.stamps;
+                    stampsProgress.textContent = data.stamps + "/30 stamps to VVIP";
+                    if (data.stamps >= 30) {
+                        stampsProgress.innerHTML = "🎉 VVIP Achieved! 🎉";
+                    }
+                }
+            } catch(err) {
+                console.error("Failed to load stamps:", err);
+            }
+        }
+        
+        // =====================================================
+        // PRODUCT SEARCH
+        // =====================================================
         
         searchInput.addEventListener('input', function(e) {
             clearTimeout(timeout);
@@ -321,6 +738,73 @@
             telegram.sendData(JSON.stringify({ action: 'view', skid: skid }));
         }
         
+        // =====================================================
+        // CASHIER ADD POINTS
+        // =====================================================
+        
+        const pointsForm = document.getElementById('pointsForm');
+        const cashierMessage = document.getElementById('cashierMessage');
+        
+        pointsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!isCashierLoggedIn) {
+                cashierMessage.className = "message error";
+                cashierMessage.textContent = "❌ Please login as cashier first.";
+                return;
+            }
+            
+            const phone = document.getElementById('phone').value;
+            const amount = parseInt(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const invoice = document.getElementById('invoice').value;
+            
+            if (!phone || !amount || amount <= 0) {
+                cashierMessage.className = "message error";
+                cashierMessage.textContent = "❌ Please fill all fields correctly.";
+                return;
+            }
+            
+            cashierMessage.className = "message info";
+            cashierMessage.textContent = "⏳ Processing...";
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'addPoints', 
+                        phone: phone,
+                        amount: amount,
+                        category: category,
+                        invoice: invoice,
+                        cashierEmail: "cashier@smile.com"
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    cashierMessage.className = "message success";
+                    cashierMessage.textContent = data.message;
+                    pointsForm.reset();
+                    if (chatId && data.chatId === chatId) {
+                        loadCustomerPoints();
+                        loadCustomerStamps();
+                    }
+                } else {
+                    cashierMessage.className = "message error";
+                    cashierMessage.textContent = data.message;
+                }
+            } catch(err) {
+                cashierMessage.className = "message error";
+                cashierMessage.textContent = "❌ Connection error. Please try again.";
+            }
+        });
+        
+        // =====================================================
+        // HELPER FUNCTIONS
+        // =====================================================
+        
         function showLoading() {
             resultsDiv.innerHTML = '<div class="loading-state">⏳ ရှာဖွေနေပါသည်...</div>';
             resultsCountDiv.style.display = 'none';
@@ -349,6 +833,10 @@
                 return m;
             });
         }
+        
+        // Load all data on start
+        loadCustomerPoints();
+        loadCustomerStamps();
     </script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </body>

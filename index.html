@@ -403,15 +403,6 @@
             background: #e74c3c;
             margin-top: 10px;
         }
-        
-        .branch-select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #e0e0e0;
-            border-radius: 16px;
-            font-size: 15px;
-            background: #fafafa;
-        }
     </style>
 </head>
 <body>
@@ -478,13 +469,6 @@
                     <input type="number" id="amount" placeholder="50000" required>
                 </div>
                 <div class="form-group">
-                    <label>🏪 Branch</label>
-                    <select id="branch" class="branch-select">
-                        <option value="YYG">ယုဇနပလာဇာ</option>
-                        <option value="KK">ဂမုန်းပွင့် (ကန်တော်လေး)</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>📦 Category</label>
                     <select id="category">
                         <option value="Mobile">Mobile</option>
@@ -518,24 +502,47 @@
         </div>
     </div>
     
-    <!-- Telegram WebApp Script (Load first) -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <script>
         // =====================================================
-        // SMILE PORTAL - Cashier & Customer Mode
+        // SMILE PORTAL - COMPLETE WORKING VERSION
         // =====================================================
         
         let timeout = null;
         let currentMode = "customer";
         let isCashierLoggedIn = false;
-        let telegram = null;
-        let chatId = null;
         
         const CASHIER_PASSWORD = "smile2024";
         
         // ⚠️ IMPORTANT: Replace with your Apps Script URL
         const API_URL = 'https://script.google.com/macros/s/AKfycbwMQOgvstjVdTRDFLwBYqfJoH0pICnt9rCLi9iWSFLVdlKFyK0oDcDbuB1Wb1c5BR8/exec';
+        
+        let telegram = null;
+        let chatId = null;
+        
+        // Wait for Telegram WebApp to load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                telegram = window.Telegram.WebApp;
+                telegram.ready();
+                telegram.expand();
+                
+                const user = telegram.initDataUnsafe?.user;
+                chatId = user?.id;
+                
+                console.log("✅ Telegram WebApp ready, chatId:", chatId);
+                
+                // Load customer data
+                loadCustomerPoints();
+                loadCustomerStamps();
+            } else {
+                console.error("❌ Telegram WebApp not found");
+                // For testing outside Telegram
+                chatId = "5114376674";
+                loadCustomerPoints();
+                loadCustomerStamps();
+            }
+        });
         
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
@@ -556,34 +563,6 @@
         const customerTier = document.getElementById('customerTier');
         const customerStamps = document.getElementById('customerStamps');
         const stampsProgress = document.getElementById('stampsProgress');
-        
-        // =====================================================
-        // INITIALIZE TELEGRAM WEBAPP
-        // =====================================================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM loaded, initializing Telegram WebApp...");
-            
-            // Initialize Telegram WebApp
-            if (window.Telegram && window.Telegram.WebApp) {
-                telegram = window.Telegram.WebApp;
-                telegram.ready();
-                telegram.expand();
-                
-                const user = telegram.initDataUnsafe?.user;
-                chatId = user?.id;
-                
-                console.log("Telegram WebApp ready, chatId:", chatId);
-                
-                // Load all data
-                loadCustomerPoints();
-                loadCustomerStamps();
-            } else {
-                console.error("Telegram WebApp not found");
-                // Fallback for testing in browser
-                chatId = "5114376674";
-            }
-        });
         
         // =====================================================
         // MODE SWITCHING
@@ -613,10 +592,6 @@
                 loginOverlay.style.display = "flex";
             }
         });
-        
-        // =====================================================
-        // LOGIN HANDLER
-        // =====================================================
         
         loginBtn.addEventListener('click', () => {
             const password = loginPassword.value;
@@ -652,12 +627,17 @@
                         chatId: chatId 
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
                     pointsDisplay.style.display = "block";
-                    customerPoints.innerText = formatPrice(data.points);
-                    customerTier.innerText = data.tier || "🥉 Gold Member";
+                    customerPoints.textContent = formatPrice(data.points);
+                    customerTier.textContent = data.tier || "🥉 Gold Member";
                 }
             } catch(err) {
                 console.error("Failed to load points:", err);
@@ -676,12 +656,17 @@
                         chatId: chatId 
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
                     stampsDisplay.style.display = "block";
-                    customerStamps.innerText = data.stamps;
-                    stampsProgress.innerText = data.stamps + "/30 stamps to VVIP";
+                    customerStamps.textContent = data.stamps;
+                    stampsProgress.textContent = data.stamps + "/30 stamps to VVIP";
                     if (data.stamps >= 30) {
                         stampsProgress.innerHTML = "🎉 VVIP Achieved! 🎉";
                     }
@@ -740,11 +725,25 @@
                         chatId: chatId 
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
-                displayResults(data, query);
+                
+                if (Array.isArray(data)) {
+                    displayResults(data, query);
+                } else if (data.results) {
+                    displayResults(data.results, query);
+                } else {
+                    displayResults([], query);
+                }
+                
             } catch(err) {
-                console.error(err);
-                showError();
+                console.error("Search error:", err);
+                resultsDiv.innerHTML = `<div class="empty-state">❌ ချိတ်ဆက်မှု အမှားရှိပါသည်။ နောက်မှ ထပ်ကြိုးစားပါ။</div>`;
+                resultsCountDiv.style.display = 'none';
             }
         }
         
@@ -776,8 +775,6 @@
         function viewProduct(skid) {
             if (telegram) {
                 telegram.sendData(JSON.stringify({ action: 'view', skid: skid }));
-            } else {
-                console.log("Would send:", skid);
             }
         }
         
@@ -799,7 +796,6 @@
             
             const phone = document.getElementById('phone').value;
             const amount = parseInt(document.getElementById('amount').value);
-            const branch = document.getElementById('branch').value;
             const category = document.getElementById('category').value;
             const invoice = document.getElementById('invoice').value;
             
@@ -820,12 +816,16 @@
                         action: 'addPoints', 
                         phone: phone,
                         amount: amount,
-                        branch: branch,
                         category: category,
                         invoice: invoice,
-                        cashierEmail: "webapp_cashier@smile.com"
+                        cashierEmail: "cashier@smile.com"
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {

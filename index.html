@@ -504,7 +504,7 @@
         const chatId = user?.id;
         
         // ⚠️ IMPORTANT: Replace with your Apps Script URL
-        const API_URL = 'https://script.google.com/macros/s/AKfycbz8yvCd0w8uamR_0Qb4HIavBzmmA8_17tgauKC9WGVmZHCuhkpuYFZu0tOb20XW3SI/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyOaZWRwJaH6q-z1KNMmraOpMm_0HVCO4Vs-I0B_DTTShnsK59a3J-DTnY_FhFGb1A/exec';
         
         const searchInput = document.getElementById('searchInput');
         const resultsDiv = document.getElementById('results');
@@ -565,28 +565,28 @@
         });
         
         async function loadCustomerPoints() {
-            if (!chatId) return;
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'getPoints', 
-                        chatId: chatId 
-                    })
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    pointsDisplay.style.display = "block";
-                    customerPoints.textContent = formatPrice(data.points);
-                    customerTier.textContent = data.tier || "🥉 Gold Member";
-                }
-            } catch(err) {
-                console.error("Failed to load points:", err);
-            }
+    if (!chatId) return;
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'getPoints', 
+                chatId: chatId 
+            })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('pointsDisplay').style.display = "block";
+            document.getElementById('customerPoints').innerText = formatPrice(data.points);
+            document.getElementById('customerTier').innerText = data.tier || "🥉 Gold Member";
         }
+    } catch(err) {
+        console.error("Failed to load points:", err);
+    }
+}
         
         searchInput.addEventListener('input', function(e) {
             clearTimeout(timeout);

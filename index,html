@@ -256,7 +256,7 @@
     </div>
 
     <script>
-      var API_URL = 'https://script.google.com/macros/s/AKfycbxn4_iIHHyGLiXy9x03MXjBqvnY_u_IzA8JgV6mi8ZvEmGd2bv-6Js-Czl1HJiGhYo/exec';
+      var API_URL = https://script.google.com/macros/s/AKfycbxybzy94UqoyoanEFqr_XraZm_Pu7Fsf5oyaf7blOZqaroCaK2FyJ1FB3f531r4oZc/exec;
       var allData = [], userRole = null, selectedItem = null, systemSettings = {}, selectedDeliType = 'COD';
       var currentCategory = 'all';
       

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Smile Mobile & Cosmetics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', 'Padauk', sans-serif; background: #f8fafc; margin: 0; padding: 0; padding-bottom: 80px; }
+        
+        .header-section { background: #111111; padding: 20px 15px 15px 15px; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .logo-container { display: flex; align-items: center; gap: 8px; }
+        .logo-smile { font-family: 'Impact', sans-serif; color: #ec008c; font-size: 28px; font-weight: 900; text-transform: uppercase; text-shadow: 2px 2px 0px #000; }
+        .logo-mobile { font-family: 'Arial', sans-serif; color: #ffffff; font-size: 16px; }
+        .date-badge { color: #888; font-size: 11px; margin-top: 8px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; }
+        .login-link { font-size: 12px; color: #aaa; cursor: pointer; border: 1px solid #444; padding: 4px 10px; border-radius: 6px; }
+        
+        .category-tabs { display: flex; gap: 12px; padding: 0 15px; margin-bottom: 20px; }
+        .cat-tab { flex: 1; padding: 12px; border-radius: 30px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; background: white; border: 1px solid #e2e8f0; }
+        .cat-tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
+        
+        .filters { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 20px; }
+        .control-input { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; background: white; font-family: inherit; }
+        
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 0 15px; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .card-body { padding: 12px; }
+        .brand-tag { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
+        .model-name { font-weight: 700; font-size: 14px; margin: 5px 0; color: #1e293b; }
+        .sell-price { color: #2563eb; font-weight: 800; font-size: 16px; }
+        .order-btn { background: #2563eb; color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; }
+        
+        .contact-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .toggle-btn { width: 55px; height: 55px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; }
+        .contact-menu { position: absolute; bottom: 70px; right: 0; background: white; width: 200px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); padding: 10px; display: none; }
+        .contact-menu.show { display: block; }
+        .menu-item { display: block; padding: 8px; text-decoration: none; color: #333; font-size: 13px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        
+        .loading-state, .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <div class="top-row">
+            <div class="logo-container">
+                <span class="logo-smile">SMILE</span>
+                <span class="logo-mobile">Mobile & Cosmetics</span>
+            </div>
+            <span onclick="openLogin()" id="loginStatus" class="login-link">Login</span>
+        </div>
+        <div class="date-badge" id="currentDate"></div>
+    </div>
+    
+    <div class="category-tabs">
+        <div class="cat-tab active" data-cat="all" onclick="setCategory('all')">📱 All Products</div>
+        <div class="cat-tab" data-cat="Mobile" onclick="setCategory('Mobile')">📱 Mobile</div>
+        <div class="cat-tab" data-cat="Cosmetic" onclick="setCategory('Cosmetic')">💄 Cosmetics</div>
+    </div>
+    
+    <div class="filters">
+        <select id="brandFilter" class="control-input" onchange="filterData()"><option value="All">All Brands</option></select>
+        <input type="text" id="searchInput" class="control-input" placeholder="Search..." onkeyup="filterData()">
+    </div>
+    
+    <div id="loading" class="loading-state">Loading...</div>
+    <div id="content" class="grid-container"></div>
+    
+    <div class="contact-widget">
+        <div id="contactMenu" class="contact-menu">
+            <a href="tel:+959780001662" class="menu-item">📞 Call Yuzana Plaza</a>
+            <a href="tel:+959780001682" class="menu-item">📞 Call GMP Shop</a>
+            <a href="viber://chat?number=959780001662" class="menu-item">💬 Viber Yuzana</a>
+            <a href="viber://chat?number=959780001682" class="menu-item">💬 Viber GMP</a>
+            <a href="https://t.me/+959780001662" class="menu-item">✈️ Telegram Yuzana</a>
+            <a href="https://t.me/+959780001682" class="menu-item">✈️ Telegram GMP</a>
+        </div>
+        <div class="toggle-btn" onclick="toggleContactMenu()">📞</div>
+    </div>
+    
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h3>Login</h3>
+            <input type="text" id="username" class="form-input" placeholder="Username">
+            <input type="password" id="password" class="form-input" placeholder="Password">
+            <button class="btn btn-primary" onclick="doLogin()">Login</button>
+            <button class="btn btn-secondary" onclick="closeModal('loginModal')">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        // =====================================================
+        // SMILE PORTAL - COMPLETE VERSION
+        // =====================================================
+        
+        // ✅ UPDATE THIS URL WITH YOUR APPS SCRIPT URL
+        var API_URL = 'https://script.google.com/macros/s/AKfycbxTX7UlvMfQXvam9aqQihk0nuD5g7CLha7bXOX6t8r_UZGKmPVPkEWub5BJu4QhFwQ/exec';
+        
+        var allData = [], userRole = null, currentCategory = 'all';
+        
+        window.onload = function() {
+            var d = new Date();
+            document.getElementById('currentDate').innerText = "📅 " + d.toLocaleDateString();
+            fetchData();
+        };
+        
+        async function fetchData() {
+            document.getElementById('loading').style.display = 'block';
+            try {
+                var response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getData' })
+                });
+                var data = await response.json();
+                initData(data);
+            } catch(err) {
+                console.error('Fetch error:', err);
+                document.getElementById('loading').innerHTML = '❌ Connection error. Please refresh.';
+            }
+        }
+        
+        function initData(data) {
+            allData = data;
+            document.getElementById('loading').style.display = 'none';
+            updateBrandFilter();
+            renderList();
+        }
+        
+        function updateBrandFilter() {
+            var brands = [...new Set(allData.map(p => p[1]))];
+            var select = document.getElementById('brandFilter');
+            select.innerHTML = '<option value="All">All Brands</option>';
+            brands.forEach(b => { if(b) select.innerHTML += `<option value="${b}">${b}</option>`; });
+        }
+        
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            filterData();
+        }
+        
+        function filterData() {
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var brand = document.getElementById('brandFilter').value;
+            var filtered = allData.filter(p => {
+                if(currentCategory !== 'all' && p[0] !== currentCategory) return false;
+                if(brand !== 'All' && p[1] !== brand) return false;
+                if(search && !(p[1] + " " + p[2]).toLowerCase().includes(search)) return false;
+                return true;
+            });
+            renderList(filtered);
+        }
+        
+        function renderList(products) {
+            var html = '';
+            products.forEach(p => {
+                html += `
+                    <div class="card">
+                        <img src="https://via.placeholder.com/300" class="card-img" loading="lazy">
+                        <div class="card-body">
+                            <div class="brand-tag">${p[1] || ''}</div>
+                            <div class="model-name">${p[2] || ''}</div>
+                            <div class="model-spec">${p[3] || ''}</div>
+                            <div class="sell-price">${p[4] ? Number(p[4]).toLocaleString() + ' Ks' : ''}</div>
+                            <button class="order-btn" onclick="orderProduct(${products.indexOf(p)})">Order Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('content').innerHTML = html || '<div class="empty-state">No products found.</div>';
+        }
+        
+        function orderProduct(index) {
+            alert('Order feature coming soon!');
+        }
+        
+        function toggleContactMenu() {
+            document.getElementById('contactMenu').classList.toggle('show');
+        }
+        
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        async function doLogin() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            try {
+                var response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'checkLogin', username: username, password: password })
+                });
+                var result = await response.json();
+                if(result.status === 'success') {
+                    userRole = result.role;
+                    closeModal('loginModal');
+                    alert('Login successful!');
+                } else {
+                    alert('Login failed');
+                }
+            } catch(err) { alert('Error: ' + err.message); }
+        }
+        
+        document.addEventListener('click', function(e) {
+            if(!document.querySelector('.contact-widget').contains(e.target)) {
+                document.getElementById('contactMenu').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
+

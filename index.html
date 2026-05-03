@@ -26,18 +26,20 @@
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 0 15px; }
         .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #f0f0f0; }
         .card-body { padding: 12px; }
         .brand-tag { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
         .model-name { font-weight: 700; font-size: 14px; margin: 5px 0; color: #1e293b; }
+        .model-spec { font-size: 11px; color: #64748b; margin-bottom: 8px; }
         .sell-price { color: #2563eb; font-weight: 800; font-size: 16px; }
         .order-btn { background: #2563eb; color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; }
         
         .contact-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .toggle-btn { width: 55px; height: 55px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; }
+        .toggle-btn { width: 55px; height: 55px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; color: white; font-size: 24px; }
         .contact-menu { position: absolute; bottom: 70px; right: 0; background: white; width: 200px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); padding: 10px; display: none; }
         .contact-menu.show { display: block; }
-        .menu-item { display: block; padding: 8px; text-decoration: none; color: #333; font-size: 13px; }
+        .menu-item { display: block; padding: 8px; text-decoration: none; color: #333; font-size: 13px; border-radius: 6px; }
+        .menu-item:hover { background: #f1f5f9; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px; }
@@ -62,9 +64,9 @@
     </div>
     
     <div class="category-tabs">
-        <div class="cat-tab active" data-cat="all" onclick="setCategory('all')">📱 All Products</div>
-        <div class="cat-tab" data-cat="Mobile" onclick="setCategory('Mobile')">📱 Mobile</div>
-        <div class="cat-tab" data-cat="Cosmetic" onclick="setCategory('Cosmetic')">💄 Cosmetics</div>
+        <div class="cat-tab active" data-cat="all" onclick="setCategory('all', this)">📱 All Products</div>
+        <div class="cat-tab" data-cat="Mobile" onclick="setCategory('Mobile', this)">📱 Mobile</div>
+        <div class="cat-tab" data-cat="Cosmetic" onclick="setCategory('Cosmetic', this)">💄 Cosmetics</div>
     </div>
     
     <div class="filters">
@@ -99,13 +101,14 @@
     
     <script>
         // =====================================================
-        // SMILE PORTAL - COMPLETE VERSION
+        // SMILE PORTAL - FIXED VERSION
         // =====================================================
         
-        // ✅ UPDATE THIS URL WITH YOUR APPS SCRIPT URL
         var API_URL = 'https://script.google.com/macros/s/AKfycbyUUkzZ-YuObwNf0DPlhTKTiFBAM33QzvbR6q_w4aymZyuUELwAo8diK_jC1Mo_ciE/exec';
         
-        var allData = [], userRole = null, currentCategory = 'all';
+        var allData = [];
+        var userRole = null;
+        var currentCategory = 'all';
         
         window.onload = function() {
             var d = new Date();
@@ -113,83 +116,164 @@
             fetchData();
         };
         
+        // ✅ FIXED: Use POST method with JSON
         async function fetchData() {
-    // Use JSONP style or proxy
-    const script = document.createElement('script');
-    script.src = API_URL + '?callback=handleData&action=getData';
-    document.body.appendChild(script);
-}
-
-function handleData(data) {
-    console.log(data);
-}
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                var response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getData' })
+                });
+                
+                var data = await response.json();
+                console.log("Received data:", data);
+                
+                if (Array.isArray(data)) {
+                    initData(data);
+                } else if (data.status === 'ready') {
+                    document.getElementById('loading').innerHTML = '⚠️ ' + data.message;
+                } else {
+                    document.getElementById('loading').innerHTML = '❌ No data received';
+                }
+                
+            } catch(err) {
+                console.error("Fetch error:", err);
+                document.getElementById('loading').innerHTML = '❌ Connection error: ' + err.message;
+            }
+        }
         
         function initData(data) {
             allData = data;
             document.getElementById('loading').style.display = 'none';
             updateBrandFilter();
-            renderList();
+            renderList(allData);
         }
         
         function updateBrandFilter() {
             var brands = [...new Set(allData.map(p => p[1]))];
             var select = document.getElementById('brandFilter');
             select.innerHTML = '<option value="All">All Brands</option>';
-            brands.forEach(b => { if(b) select.innerHTML += `<option value="${b}">${b}</option>`; });
+            brands.forEach(b => {
+                if(b) {
+                    var option = document.createElement('option');
+                    option.value = b;
+                    option.textContent = b;
+                    select.appendChild(option);
+                }
+            });
         }
         
-        function setCategory(cat) {
+        function setCategory(cat, element) {
             currentCategory = cat;
             document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            if(element) element.classList.add('active');
             filterData();
         }
         
         function filterData() {
-            var search = document.getElementById('searchInput').value.toLowerCase();
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
             var brand = document.getElementById('brandFilter').value;
-            var filtered = allData.filter(p => {
-                if(currentCategory !== 'all' && p[0] !== currentCategory) return false;
-                if(brand !== 'All' && p[1] !== brand) return false;
-                if(search && !(p[1] + " " + p[2]).toLowerCase().includes(search)) return false;
+            
+            var filtered = allData.filter(function(p) {
+                // Category filter
+                if (currentCategory !== 'all' && p[0] !== currentCategory) return false;
+                // Brand filter
+                if (brand !== 'All' && p[1] !== brand) return false;
+                // Search filter
+                if (searchTerm) {
+                    var searchText = (p[1] + " " + p[2] + " " + (p[3] || "")).toLowerCase();
+                    if (!searchText.includes(searchTerm)) return false;
+                }
                 return true;
             });
+            
             renderList(filtered);
         }
         
         function renderList(products) {
+            var container = document.getElementById('content');
+            
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="empty-state">No products found.</div>';
+                return;
+            }
+            
             var html = '';
-            products.forEach(p => {
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                var price = p[4] ? Number(p[4]).toLocaleString() + ' Ks' : '';
+                var spec = p[3] || '';
+                
                 html += `
                     <div class="card">
-                        <img src="https://via.placeholder.com/300" class="card-img" loading="lazy">
+                        <img src="https://via.placeholder.com/300?text=${encodeURIComponent(p[1] || 'Product')}" class="card-img" loading="lazy">
                         <div class="card-body">
-                            <div class="brand-tag">${p[1] || ''}</div>
-                            <div class="model-name">${p[2] || ''}</div>
-                            <div class="model-spec">${p[3] || ''}</div>
-                            <div class="sell-price">${p[4] ? Number(p[4]).toLocaleString() + ' Ks' : ''}</div>
-                            <button class="order-btn" onclick="orderProduct(${products.indexOf(p)})">Order Now</button>
+                            <div class="brand-tag">${escapeHtml(p[1] || '')}</div>
+                            <div class="model-name">${escapeHtml(p[2] || '')}</div>
+                            <div class="model-spec">${escapeHtml(spec)}</div>
+                            <div class="sell-price">${price}</div>
+                            <button class="order-btn" onclick="orderProduct(${i})">Order Now</button>
                         </div>
                     </div>
                 `;
-            });
-            document.getElementById('content').innerHTML = html || '<div class="empty-state">No products found.</div>';
+            }
+            container.innerHTML = html;
         }
         
         function orderProduct(index) {
-            alert('Order feature coming soon!');
+            var filtered = getFilteredData();
+            var product = filtered[index];
+            if (product) {
+                alert("Order: " + product[1] + " " + product[2] + "\nPrice: " + product[4] + " Ks\n\nOrder feature coming soon!");
+            } else {
+                alert("Product not found");
+            }
+        }
+        
+        function getFilteredData() {
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            var brand = document.getElementById('brandFilter').value;
+            
+            return allData.filter(function(p) {
+                if (currentCategory !== 'all' && p[0] !== currentCategory) return false;
+                if (brand !== 'All' && p[1] !== brand) return false;
+                if (searchTerm) {
+                    var searchText = (p[1] + " " + p[2] + " " + (p[3] || "")).toLowerCase();
+                    if (!searchText.includes(searchTerm)) return false;
+                }
+                return true;
+            });
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
         
         function toggleContactMenu() {
-            document.getElementById('contactMenu').classList.toggle('show');
+            var menu = document.getElementById('contactMenu');
+            menu.classList.toggle('show');
         }
         
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openLogin() { 
+            document.getElementById('loginModal').style.display = 'flex'; 
+        }
+        
+        function closeModal(id) { 
+            document.getElementById(id).style.display = 'none'; 
+        }
         
         async function doLogin() {
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
+            
             try {
                 var response = await fetch(API_URL, {
                     method: 'POST',
@@ -197,42 +281,27 @@ function handleData(data) {
                     body: JSON.stringify({ action: 'checkLogin', username: username, password: password })
                 });
                 var result = await response.json();
-                if(result.status === 'success') {
+                
+                if (result.status === 'success') {
                     userRole = result.role;
                     closeModal('loginModal');
+                    document.getElementById('loginStatus').innerText = "User: " + username;
                     alert('Login successful!');
                 } else {
-                    alert('Login failed');
+                    alert('Login failed: ' + (result.message || 'Invalid credentials'));
                 }
-            } catch(err) { alert('Error: ' + err.message); }
+            } catch(err) {
+                alert('Error: ' + err.message);
+            }
         }
         
+        // Close contact menu when clicking outside
         document.addEventListener('click', function(e) {
-            if(!document.querySelector('.contact-widget').contains(e.target)) {
+            var widget = document.querySelector('.contact-widget');
+            if (widget && !widget.contains(e.target)) {
                 document.getElementById('contactMenu').classList.remove('show');
             }
         });
     </script>
 </body>
 </html>
-
-function doPost(e) {
-  var output = ContentService.createTextOutput();
-  output.setMimeType(ContentService.MimeType.JAVASCRIPT);
-  
-  var callback = "callback";
-  var data = { status: "ok", message: "Hello" };
-  
-  output.setContent(callback + "(" + JSON.stringify(data) + ");");
-  return output;
-}
-
-<script>
-function handleResponse(data) {
-  console.log(data);
-}
-
-var script = document.createElement('script');
-script.src = 'https://script.google.com/macros/s/YOUR_URL/exec?callback=handleResponse';
-document.body.appendChild(script);
-</script>

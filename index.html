@@ -118,31 +118,27 @@
         
         // ✅ FIXED: Use POST method with JSON
         async function fetchData() {
-            document.getElementById('loading').style.display = 'block';
-            
-            try {
-                var response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getData' })
-                });
-                
-                var data = await response.json();
-                console.log("Received data:", data);
-                
-                if (Array.isArray(data)) {
-                    initData(data);
-                } else if (data.status === 'ready') {
-                    document.getElementById('loading').innerHTML = '⚠️ ' + data.message;
-                } else {
-                    document.getElementById('loading').innerHTML = '❌ No data received';
-                }
-                
-            } catch(err) {
-                console.error("Fetch error:", err);
-                document.getElementById('loading').innerHTML = '❌ Connection error: ' + err.message;
-            }
+    document.getElementById('loading').style.display = 'block';
+    
+    try {
+        const response = await fetch(API_URL + '?action=getData');
+        const data = await response.json();
+        
+        console.log("Received:", data);
+        
+        if (data && Array.isArray(data) && data.length > 0) {
+            initData(data);
+        } else if (data && data.data && data.data.length > 0) {
+            initData(data.data);
+        } else {
+            document.getElementById('loading').innerHTML = '❌ No products found';
         }
+        
+    } catch(err) {
+        console.error("Fetch error:", err);
+        document.getElementById('loading').innerHTML = '❌ Connection error: ' + err.message;
+    }
+}
         
         function initData(data) {
             allData = data;

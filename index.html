@@ -114,20 +114,15 @@
         };
         
         async function fetchData() {
-            document.getElementById('loading').style.display = 'block';
-            try {
-                var response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getData' })
-                });
-                var data = await response.json();
-                initData(data);
-            } catch(err) {
-                console.error('Fetch error:', err);
-                document.getElementById('loading').innerHTML = '❌ Connection error. Please refresh.';
-            }
-        }
+    // Use JSONP style or proxy
+    const script = document.createElement('script');
+    script.src = API_URL + '?callback=handleData&action=getData';
+    document.body.appendChild(script);
+}
+
+function handleData(data) {
+    console.log(data);
+}
         
         function initData(data) {
             allData = data;
@@ -220,3 +215,14 @@
     </script>
 </body>
 </html>
+
+function doPost(e) {
+  var output = ContentService.createTextOutput();
+  output.setMimeType(ContentService.MimeType.JAVASCRIPT);
+  
+  var callback = "callback";
+  var data = { status: "ok", message: "Hello" };
+  
+  output.setContent(callback + "(" + JSON.stringify(data) + ");");
+  return output;
+}

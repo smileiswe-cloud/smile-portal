@@ -103,7 +103,7 @@
         // =====================================================
         
         // ✅ UPDATE THIS URL WITH YOUR APPS SCRIPT URL
-        var API_URL = 'https://script.google.com/macros/s/AKfycbyJamnowsUey54pbOoCClms3GwKC7NkDnmuldmu_Uq0J3Ct9Xa_g0_aDv4yOlGF-HA/exec';
+        var API_URL = 'https://script.google.com/macros/s/AKfycbyUUkzZ-YuObwNf0DPlhTKTiFBAM33QzvbR6q_w4aymZyuUELwAo8diK_jC1Mo_ciE/exec';
         
         var allData = [], userRole = null, currentCategory = 'all';
         
@@ -226,3 +226,13 @@ function doPost(e) {
   output.setContent(callback + "(" + JSON.stringify(data) + ");");
   return output;
 }
+
+<script>
+function handleResponse(data) {
+  console.log(data);
+}
+
+var script = document.createElement('script');
+script.src = 'https://script.google.com/macros/s/YOUR_URL/exec?callback=handleResponse';
+document.body.appendChild(script);
+</script>

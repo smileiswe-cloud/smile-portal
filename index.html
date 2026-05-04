@@ -305,33 +305,3 @@
     </script>
 </body>
 </html>
-
-// ဒီတစ်ခါပဲရှိရမယ်
-function fetchData() {
-    var script = document.createElement('script');
-    script.src = API_URL + '?callback=handleData&action=getData';
-    document.body.appendChild(script);
-}
-
-// ဒီတစ်ခါပဲရှိရမယ်
-function handleData(data) {
-    console.log("Received:", data);
-    if (data && data.length > 0) {
-        initData(data);
-    } else {
-        document.getElementById('loading').innerHTML = '❌ No data received';
-    }
-}function fetchData() {
-    var script = document.createElement('script');
-    script.src = API_URL + '?callback=handleData&action=getData';
-    document.body.appendChild(script);
-}
-
-function handleData(data) {
-    console.log("Received:", data);
-    if (data && data.length > 0) {
-        initData(data);
-    } else {
-        document.getElementById('loading').innerHTML = '❌ No data received';
-    }
-}

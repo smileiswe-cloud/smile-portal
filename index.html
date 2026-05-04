@@ -20,6 +20,7 @@
         .category-tabs { display: flex; gap: 12px; padding: 0 15px; margin-bottom: 20px; }
         .cat-tab { flex: 1; padding: 12px; border-radius: 30px; text-align: center; font-weight: 600; font-size: 14px; cursor: pointer; background: white; border: 1px solid #e2e8f0; }
         .cat-tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
+        .cat-tab.cosmetic.active { background: linear-gradient(135deg, #ec008c 0%, #f093fb 100%); }
         
         .filters { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 20px; }
         .control-input { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; background: white; font-family: inherit; }
@@ -41,14 +42,9 @@
         .menu-item { display: block; padding: 8px; text-decoration: none; color: #333; font-size: 13px; border-radius: 6px; }
         .menu-item:hover { background: #f1f5f9; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        .btn-primary { background: #2563eb; color: white; }
-        .btn-secondary { background: #f1f5f9; color: #475569; }
-        
         .loading-state, .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+        
+        .cosmetic-price { color: #ec008c; }
     </style>
 </head>
 <body>
@@ -66,7 +62,7 @@
     <div class="category-tabs">
         <div class="cat-tab active" data-cat="all" onclick="setCategory('all', this)">📱 All Products</div>
         <div class="cat-tab" data-cat="Mobile" onclick="setCategory('Mobile', this)">📱 Mobile</div>
-        <div class="cat-tab" data-cat="Cosmetic" onclick="setCategory('Cosmetic', this)">💄 Cosmetics</div>
+        <div class="cat-tab cosmetic" data-cat="Cosmetic" onclick="setCategory('Cosmetic', this)">💄 Cosmetics</div>
     </div>
     
     <div class="filters">
@@ -89,110 +85,71 @@
         <div class="toggle-btn" onclick="toggleContactMenu()">📞</div>
     </div>
     
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
+    <div id="loginModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+        <div class="modal-content" style="background:white; padding:20px; border-radius:16px; width:90%; max-width:400px;">
             <h3>Login</h3>
-            <input type="text" id="username" class="form-input" placeholder="Username">
-            <input type="password" id="password" class="form-input" placeholder="Password">
-            <button class="btn btn-primary" onclick="doLogin()">Login</button>
-            <button class="btn btn-secondary" onclick="closeModal('loginModal')">Close</button>
+            <input type="text" id="username" class="form-input" placeholder="Username" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+            <input type="password" id="password" class="form-input" placeholder="Password" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+            <button class="btn btn-primary" onclick="doLogin()" style="width:100%; padding:12px; background:#2563eb; color:white; border:none; border-radius:8px;">Login</button>
+            <button class="btn btn-secondary" onclick="closeModal('loginModal')" style="width:100%; padding:12px; margin-top:10px; background:#f1f5f9; border:none; border-radius:8px;">Close</button>
         </div>
     </div>
     
     <script>
         // =====================================================
-        // SMILE PORTAL - FIXED VERSION
+        // SMILE PORTAL - COMPLETE VERSION
         // =====================================================
         
+        // ✅ UPDATE THIS URL WITH YOUR WORKER URL
         var API_URL = 'https://smilepotal.smileiswe.workers.dev/';
         
         var allData = [];
-        var userRole = null;
         var currentCategory = 'all';
+        var currentFilteredData = [];
         
         window.onload = function() {
             var d = new Date();
             document.getElementById('currentDate').innerText = "📅 " + d.toLocaleDateString();
-            fetchData();
+            fetchData('all');
         };
         
-        // ✅ FIXED: Use POST method with JSON
-        async function fetchData() {
+        // ✅ FETCH DATA FROM WORKER (JSONP)
+        function fetchData(category) {
             document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').innerHTML = '';
             
-            try {
-                var response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getData' })
-                });
-                
-                var data = await response.json();
-                console.log("Received data:", data);
-                
-                if (Array.isArray(data)) {
-                    initData(data);
-                } else if (data.status === 'ready') {
-                    document.getElementById('loading').innerHTML = '⚠️ ' + data.message;
-                } else {
-                    document.getElementById('loading').innerHTML = '❌ No data received';
-                }
-                
-            } catch(err) {
-                console.error("Fetch error:", err);
-                document.getElementById('loading').innerHTML = '❌ Connection error: ' + err.message;
+            var url = API_URL + '?callback=handleData&action=getData';
+            if (category && category !== 'all') {
+                url += '&category=' + category;
+            }
+            
+            var script = document.createElement('script');
+            script.src = url;
+            script.onerror = function() {
+                document.getElementById('loading').innerHTML = '❌ Connection error. Please refresh.';
+            };
+            document.body.appendChild(script);
+        }
+        
+        // ✅ HANDLE DATA FROM WORKER
+        function handleData(data) {
+            console.log("Received:", data.length, "products");
+            
+            if (data && data.length > 0) {
+                allData = data;
+                document.getElementById('loading').style.display = 'none';
+                updateBrandFilter();
+                displayProducts(allData);
+            } else if (data && data.error) {
+                document.getElementById('loading').innerHTML = '❌ ' + data.error;
+            } else {
+                document.getElementById('loading').innerHTML = '❌ No products found';
+                document.getElementById('content').innerHTML = '<div class="empty-state">No products found.</div>';
             }
         }
         
-        function initData(data) {
-            allData = data;
-            document.getElementById('loading').style.display = 'none';
-            updateBrandFilter();
-            renderList(allData);
-        }
-        
-        function updateBrandFilter() {
-            var brands = [...new Set(allData.map(p => p[1]))];
-            var select = document.getElementById('brandFilter');
-            select.innerHTML = '<option value="All">All Brands</option>';
-            brands.forEach(b => {
-                if(b) {
-                    var option = document.createElement('option');
-                    option.value = b;
-                    option.textContent = b;
-                    select.appendChild(option);
-                }
-            });
-        }
-        
-        function setCategory(cat, element) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-            if(element) element.classList.add('active');
-            filterData();
-        }
-        
-        function filterData() {
-            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            var brand = document.getElementById('brandFilter').value;
-            
-            var filtered = allData.filter(function(p) {
-                // Category filter
-                if (currentCategory !== 'all' && p[0] !== currentCategory) return false;
-                // Brand filter
-                if (brand !== 'All' && p[1] !== brand) return false;
-                // Search filter
-                if (searchTerm) {
-                    var searchText = (p[1] + " " + p[2] + " " + (p[3] || "")).toLowerCase();
-                    if (!searchText.includes(searchTerm)) return false;
-                }
-                return true;
-            });
-            
-            renderList(filtered);
-        }
-        
-        function renderList(products) {
+        // ✅ DISPLAY PRODUCTS
+        function displayProducts(products) {
             var container = document.getElementById('content');
             
             if (!products || products.length === 0) {
@@ -203,18 +160,20 @@
             var html = '';
             for (var i = 0; i < products.length; i++) {
                 var p = products[i];
-                var price = p[4] ? Number(p[4]).toLocaleString() + ' Ks' : '';
-                var spec = p[3] || '';
+                var priceClass = (p.category === 'Cosmetic') ? 'cosmetic-price' : '';
+                var brand = p.brand || '';
+                var spec = p.spec || '';
+                var name = p.name || '';
                 
                 html += `
                     <div class="card">
-                        <img src="https://via.placeholder.com/300?text=${encodeURIComponent(p[1] || 'Product')}" class="card-img" loading="lazy">
+                        <img src="https://via.placeholder.com/300?text=${encodeURIComponent(brand)}" class="card-img" loading="lazy">
                         <div class="card-body">
-                            <div class="brand-tag">${escapeHtml(p[1] || '')}</div>
-                            <div class="model-name">${escapeHtml(p[2] || '')}</div>
+                            <div class="brand-tag">${escapeHtml(brand)}</div>
+                            <div class="model-name">${escapeHtml(name)}</div>
                             <div class="model-spec">${escapeHtml(spec)}</div>
-                            <div class="sell-price">${price}</div>
-                            <button class="order-btn" onclick="orderProduct(${i})">Order Now</button>
+                            <div class="sell-price ${priceClass}">${formatPrice(p.price)} Ks</div>
+                            <button class="order-btn" onclick="orderProduct('${p.skid}')">Order Now</button>
                         </div>
                     </div>
                 `;
@@ -222,29 +181,61 @@
             container.innerHTML = html;
         }
         
-        function orderProduct(index) {
-            var filtered = getFilteredData();
-            var product = filtered[index];
-            if (product) {
-                alert("Order: " + product[1] + " " + product[2] + "\nPrice: " + product[4] + " Ks\n\nOrder feature coming soon!");
-            } else {
-                alert("Product not found");
+        // ✅ UPDATE BRAND FILTER
+        function updateBrandFilter() {
+            var brands = {};
+            for (var i = 0; i < allData.length; i++) {
+                if (allData[i].brand && allData[i].brand !== "") {
+                    brands[allData[i].brand] = true;
+                }
+            }
+            var brandList = Object.keys(brands).sort();
+            var select = document.getElementById('brandFilter');
+            select.innerHTML = '<option value="All">All Brands</option>';
+            for (var i = 0; i < brandList.length; i++) {
+                select.innerHTML += '<option value="' + escapeHtml(brandList[i]) + '">' + escapeHtml(brandList[i]) + '</option>';
             }
         }
         
-        function getFilteredData() {
+        // ✅ FILTER DATA
+        function filterData() {
             var searchTerm = document.getElementById('searchInput').value.toLowerCase();
             var brand = document.getElementById('brandFilter').value;
             
-            return allData.filter(function(p) {
-                if (currentCategory !== 'all' && p[0] !== currentCategory) return false;
-                if (brand !== 'All' && p[1] !== brand) return false;
+            var filtered = allData.filter(function(p) {
+                if (currentCategory !== 'all' && p.category !== currentCategory) return false;
+                if (brand !== 'All' && p.brand !== brand) return false;
                 if (searchTerm) {
-                    var searchText = (p[1] + " " + p[2] + " " + (p[3] || "")).toLowerCase();
+                    var searchText = (p.name + " " + p.brand + " " + p.spec).toLowerCase();
                     if (!searchText.includes(searchTerm)) return false;
                 }
                 return true;
             });
+            
+            displayProducts(filtered);
+        }
+        
+        // ✅ SET CATEGORY
+        function setCategory(cat, element) {
+            currentCategory = cat;
+            
+            var tabs = document.querySelectorAll('.cat-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            if (element) element.classList.add('active');
+            
+            fetchData(cat);
+        }
+        
+        // ✅ ORDER PRODUCT
+        function orderProduct(skid) {
+            alert("Order feature coming soon!\nSKID: " + skid);
+        }
+        
+        // ✅ HELPER FUNCTIONS
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
         
         function escapeHtml(str) {
@@ -262,37 +253,17 @@
             menu.classList.toggle('show');
         }
         
-        function openLogin() { 
-            document.getElementById('loginModal').style.display = 'flex'; 
+        function openLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
         }
         
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
         
-        async function doLogin() {
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            
-            try {
-                var response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'checkLogin', username: username, password: password })
-                });
-                var result = await response.json();
-                
-                if (result.status === 'success') {
-                    userRole = result.role;
-                    closeModal('loginModal');
-                    document.getElementById('loginStatus').innerText = "User: " + username;
-                    alert('Login successful!');
-                } else {
-                    alert('Login failed: ' + (result.message || 'Invalid credentials'));
-                }
-            } catch(err) {
-                alert('Error: ' + err.message);
-            }
+        function doLogin() {
+            alert("Login feature coming soon!");
+            closeModal('loginModal');
         }
         
         // Close contact menu when clicking outside
